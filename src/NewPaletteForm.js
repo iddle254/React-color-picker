@@ -1,96 +1,55 @@
-import React from 'react';
-import clsx from 'clsx';
-import { makeStyles } from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import CssBaseline from '@material-ui/core/CssBaseline';
+import React, { Component } from "react";
+import classNames from "classnames";
+import { withStyles } from "@material-ui/core/styles";
 import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/Toolbar';
-import Typography from '@material-ui/core/Typography';
-import Divider from '@material-ui/core/Divider';
-import IconButton from '@material-ui/core/IconButton';
 import MenuIcon from '@material-ui/icons/Menu';
-import ChevronLeftIcon from '@material-ui/icons/ChevronLeft';
-import Button from '@material-ui/core/Button';
-import {ChromePicker} from 'react-color';
+import Drawer from "@material-ui/core/Drawer";
+import Typography from "@material-ui/core/Typography";
+import Divider from "@material-ui/core/Divider";
+import IconButton from "@material-ui/core/IconButton";
+import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
+import Button from "@material-ui/core/Button";
+import { ChromePicker } from "react-color";
+import styles from "./styles/NewPaletteFormStyles";
 
-const drawerWidth = 350;
 
-const useStyles = makeStyles(theme => ({
-  root: {
-    display: 'flex',
-  },
-  appBar: {
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-  },
-  appBarShift: {
-    width: `calc(100% - ${drawerWidth}px)`,
-    marginLeft: drawerWidth,
-    transition: theme.transitions.create(['margin', 'width'], {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-  },
-  menuButton: {
-    marginRight: theme.spacing(2),
-  },
-  hide: {
-    display: 'none',
-  },
-  drawer: {
-    width: drawerWidth,
-    flexShrink: 0,
-  },
-  drawerPaper: {
-    width: drawerWidth,
-  },
-  drawerHeader: {
-    display: 'flex',
-    alignItems: 'center',
-    padding: theme.spacing(0, 1),
-    ...theme.mixins.toolbar,
-    justifyContent: 'flex-end',
-  },
-  content: {
-    flexGrow: 1,
-    padding: theme.spacing(3),
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.sharp,
-      duration: theme.transitions.duration.leavingScreen,
-    }),
-    marginLeft: -drawerWidth,
-  },
-  contentShift: {
-    transition: theme.transitions.create('margin', {
-      easing: theme.transitions.easing.easeOut,
-      duration: theme.transitions.duration.enteringScreen,
-    }),
-    marginLeft: 0,
-  },
-}));
 
-export default function NewPaletteForm() {
-    const classes = useStyles();
-  const [open, setOpen] = React.useState(false);
+class NewPaletteForm extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      open: true,
+      currentColor: "brown",
+      colors: ["purple", "#d98354"]
+    };
+    this.updateCurrentColor = this.updateCurrentColor.bind(this);
+    this.addNewColor = this.addNewColor.bind(this);
+  }
 
-  const handleDrawerOpen = () => {
-    setOpen(true);
+  handleDrawerOpen = () => {
+    this.setState({ open: true });
   };
 
-  const handleDrawerClose = () => {
-    setOpen(false);
+  handleDrawerClose = () => {
+    this.setState({ open: false });
   };
+  updateCurrentColor(newColor) {
+    this.setState({currentColor: newColor.hex});
+  }
+  addNewColor(){
+    this.setState({colors:[...this.state.colors, this.state.currentColor]});
+  }
 
+  render() {
+    const { classes } = this.props;
+    const { open, currentColor } = this.state;
 
-    
-        return (
-            <div className={classes.root}>
-      <CssBaseline />
-      <AppBar
+    return (
+      <div className={classes.root}>
+        <AppBar
         position="fixed"
-        className={clsx(classes.appBar, {
+        className={classNames(classes.appBar, {
           [classes.appBarShift]: open,
         })}
       >
@@ -98,49 +57,83 @@ export default function NewPaletteForm() {
           <IconButton
             color="inherit"
             aria-label="open drawer"
-            onClick={handleDrawerOpen}
+            onClick={this.handleDrawerOpen}
             edge="start"
-            className={clsx(classes.menuButton, open && classes.hide)}
+            className={classNames(classes.menuButton, open && classes.hide)}
           >
             <MenuIcon />
           </IconButton>
           <Typography variant="h6" noWrap>
-            Persistent drawer
+            Color App
           </Typography>
         </Toolbar>
       </AppBar>
-      <Drawer
-        className={classes.drawer}
-        variant="persistent"
-        anchor="left"
-        open={open}
-        classes={{
-          paper: classes.drawerPaper,
-        }}
-      >
-        <div className={classes.drawerHeader}>
-          <IconButton onClick={handleDrawerClose}>
-             <ChevronLeftIcon /> 
-          </IconButton>
-        </div>
-        <Divider />
-        <Typography variant="h4">Design your palette</Typography>
-        <div>
-        <Button variant="contained" color="secondary">Clear Palette</Button>
-        <Button variant="contained" color="primary">Random color</Button>
-        </div>
-        <ChromePicker color="purple" onChangeComplete={(newColor)=>console.log(newColor)} />
-        <Button variant="contained" color="primary">Add color</Button>
         
-      </Drawer>
-      <main
-        className={clsx(classes.content, {
-          [classes.contentShift]: open,
-        })}
-      >
-        <div className={classes.drawerHeader} />
-        
-      </main>
-    </div>
-        )    
+        <Drawer
+          className={classes.drawer}
+          variant='persistent'
+          anchor='left'
+          open={open}
+          classes={{
+            paper: classes.drawerPaper
+          }}
+        >
+          <div className={classes.drawerHeader}>
+            <IconButton onClick={this.handleDrawerClose}>
+              <ChevronLeftIcon />
+            </IconButton>
+          </div>
+          <Divider />
+          <div className={classes.container}>
+            <Typography variant='h4' gutterBottom>
+              Design Your Palette
+            </Typography>
+            <div className={classes.buttons}>
+              <Button
+                variant='contained'
+                color='secondary'
+                onClick={this.clearColors}
+                className={classes.button}
+              >
+                Clear Palette
+              </Button>
+              <Button
+                variant='contained'
+                className={classes.button}
+                color='primary'
+                onClick={this.addRandomColor}
+              >
+                Random Color
+              </Button>
+              <ChromePicker
+            color={currentColor}
+            onChangeComplete={this.updateCurrentColor}
+          />
+          <Button
+            variant='contained'
+            color='primary'
+            style={{ backgroundColor: currentColor }}
+            onClick={this.addNewColor}
+          >Add Color
+          </Button>
+            </div>
+            
+          </div>
+        </Drawer>
+        <main
+          className={classNames(classes.content, {
+            [classes.contentShift]: open
+          })}
+        >
+          <div className={classes.drawerHeader} />
+          <ul>
+            {this.state.colors.map(color => (
+                <li>{color}</li>)
+            )}
+          </ul>
+        </main>
+      </div>
+    );
+  }
 }
+export default withStyles(styles, { withTheme: true })(NewPaletteForm);
