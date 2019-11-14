@@ -12,6 +12,7 @@ import ChevronLeftIcon from "@material-ui/icons/ChevronLeft";
 import Button from "@material-ui/core/Button";
 import { ChromePicker } from "react-color";
 import styles from "./styles/NewPaletteFormStyles";
+import DraggableColorbox from './DraggableColorbox';
 
 
 
@@ -126,11 +127,10 @@ class NewPaletteForm extends Component {
           })}
         >
           <div className={classes.drawerHeader} />
-          <ul>
-            {this.state.colors.map(color => (
-                <li>{color}</li>)
+          
+            {this.state.colors.map(color => <DraggableColorbox color={color}/>
             )}
-          </ul>
+          
         </main>
       </div>
     );
