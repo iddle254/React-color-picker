@@ -76,6 +76,11 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
     this.props.savePalette(newPalette);
     this.props.history.push("/");
   }
+  removeColor(newColor){
+    this.setState({
+      colors: this.state.colors.filter(color => color.name !== newColor)
+    })
+  }
 
   render() {
     const { classes } = this.props;
@@ -183,7 +188,7 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
         >
           <div className={classes.drawerHeader} />
           
-            {this.state.colors.map(color => <DraggableColorbox color={color.color} name={color.name}/>
+            {this.state.colors.map(color => <DraggableColorbox key={color.name} handleClick={()=> this.removeColor(color.name)} color={color.color} name={color.name}/>
             )}
           
         </main>
