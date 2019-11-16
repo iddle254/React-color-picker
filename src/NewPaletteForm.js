@@ -13,9 +13,8 @@ import Button from "@material-ui/core/Button";
 import { ValidatorForm, TextValidator} from 'react-material-ui-form-validator';
 import { ChromePicker } from "react-color";
 import styles from "./styles/NewPaletteFormStyles";
-import DraggableColorbox from './DraggableColorbox';
-
-
+import DraggableColorList from './DraggableColorList';
+import {arrayMove} from 'react-sortable-hoc';
 
 class NewPaletteForm extends Component {
   constructor(props) {
@@ -31,6 +30,7 @@ class NewPaletteForm extends Component {
     this.addNewColor = this.addNewColor.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.savePalette = this.savePalette.bind(this);
+    this.removeColor = this.removeColor.bind(this);
   }
   componentDidMount(props) {
     ValidatorForm.addValidationRule("isColorNameUnique", value => this.state.colors.every(
@@ -81,10 +81,15 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
       colors: this.state.colors.filter(color => color.name !== newColor)
     })
   }
+  onSortEnd = ({oldIndex, newIndex}) => {
+    this.setState(({colors}) => ({
+      items: arrayMove(colors, oldIndex, newIndex),
+    }));
+  };
 
   render() {
     const { classes } = this.props;
-    const { open, currentColor } = this.state;
+    const { open, currentColor, colors } = this.state;
 
     return (
       <div className={classes.root}>
@@ -187,9 +192,8 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
           })}
         >
           <div className={classes.drawerHeader} />
-          
-            {this.state.colors.map(color => <DraggableColorbox key={color.name} handleClick={()=> this.removeColor(color.name)} color={color.color} name={color.name}/>
-            )}
+          <DraggableColorList color={colors} removeColor={this.removeColor} axis='xy' onSortEnd={this.onSortEnd}/>         
+            
           
         </main>
       </div>
