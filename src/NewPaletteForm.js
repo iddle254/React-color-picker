@@ -17,12 +17,15 @@ import DraggableColorList from './DraggableColorList';
 import {arrayMove} from 'react-sortable-hoc';
 
 class NewPaletteForm extends Component {
+  static defaultProps = {
+    maxColors:20 
+  }
   constructor(props) {
     super(props);
     this.state = {
       open: true,
       currentColor: "blue",
-      colors: [{color:"blue",name:"blue"}],
+      colors: this.props.palettes[0].colors,
       newColorName: "",
       newPaletteName: ""
     };
@@ -31,6 +34,8 @@ class NewPaletteForm extends Component {
     this.handleChange = this.handleChange.bind(this);
     this.savePalette = this.savePalette.bind(this);
     this.removeColor = this.removeColor.bind(this);
+    this.clearColors = this.clearColors.bind(this);
+    this.addRandomColor = this.addRandomColor.bind(this);
   }
   componentDidMount(props) {
     ValidatorForm.addValidationRule("isColorNameUnique", value => this.state.colors.every(
@@ -86,11 +91,20 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
       items: arrayMove(colors, oldIndex, newIndex),
     }));
   };
-
+  clearColors(){
+    this.setState({colors: []})
+  }
+  addRandomColor(){
+    const allColors = this.props.palettes.map(p => p.colors).flat();
+    var rand = Math.floor(Math.random() * allColors.length);
+    const randomColor=allColors[rand];
+    this.setState({
+      colors: [...this.state.colors, randomColor]
+    })}
   render() {
-    const { classes } = this.props;
+    const { classes, maxColors } = this.props;
     const { open, currentColor, colors } = this.state;
-
+    const paletteIsFull = colors.length >= maxColors;
     return (
       <div className={classes.root}>
         <AppBar
@@ -158,6 +172,7 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
                 className={classes.button}
                 color='primary'
                 onClick={this.addRandomColor}
+                disabled={paletteIsFull}
               >
                 Random Color
               </Button>
@@ -176,9 +191,10 @@ ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palet
              <Button
             variant='contained'
             color='primary'
-            style={{ backgroundColor: currentColor }}
+            style={{ backgroundColor: paletteIsFull?"grey":currentColor }}
             type='submit'
-          >Add Color
+            disabled = {paletteIsFull}
+          >{paletteIsFull? "Palette full": "Add Color"}
           </Button>
           </ValidatorForm>
           
