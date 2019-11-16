@@ -24,13 +24,15 @@ class NewPaletteForm extends Component {
       open: true,
       currentColor: "blue",
       colors: [{color:"blue",name:"blue"}],
-      newName: ""
+      newColorName: "",
+      newPaletteName: ""
     };
     this.updateCurrentColor = this.updateCurrentColor.bind(this);
     this.addNewColor = this.addNewColor.bind(this);
     this.handleChange = this.handleChange.bind(this);
+    this.savePalette = this.savePalette.bind(this);
   }
-  componentDidMount() {
+  componentDidMount(props) {
     ValidatorForm.addValidationRule("isColorNameUnique", value => this.state.colors.every(
           ({name}) => name.toLowerCase() !== value.toLowerCase()
         )
@@ -39,6 +41,10 @@ class NewPaletteForm extends Component {
       this.state.colors.every(
         ({color}) => color !== this.state.currentColor
       )
+);
+ValidatorForm.addValidationRule("isPaletteNameUnique", value => this.props.palettes.every(
+  ({paletteName}) => paletteName.toLowerCase() !== value.toLowerCase()
+)
 );
 }
 
@@ -53,11 +59,22 @@ class NewPaletteForm extends Component {
     this.setState({currentColor: newColor.hex});
   }
   addNewColor(){
-    const newColor = {color:this.state.currentColor, name:this.state.newName}
-    this.setState({colors:[...this.state.colors, newColor], newColor:""});
+    const newColor = {color:this.state.currentColor, name:this.state.newColorName}
+    this.setState({colors:[...this.state.colors, newColor], newColorName:""});
   }
   handleChange(evt){
-    this.setState({newName: evt.target.value});
+    this.setState({[evt.target.name]: evt.target.value});
+  }
+  savePalette(){    
+    let newName = this.state.newPaletteName;
+    const newPalette = {
+      paletteName:newName,
+      id: newName.toLowerCase().replace(/ /g, "-"),
+      colors: this.state.colors
+    };
+    console.log(newPalette);
+    this.props.savePalette(newPalette);
+    this.props.history.push("/");
   }
 
   render() {
@@ -68,6 +85,7 @@ class NewPaletteForm extends Component {
       <div className={classes.root}>
         <AppBar
         position="fixed"
+        color="default"
         className={classNames(classes.appBar, {
           [classes.appBarShift]: open,
         })}
@@ -85,6 +103,15 @@ class NewPaletteForm extends Component {
           <Typography variant="h6" noWrap>
             Color App
           </Typography>
+          <ValidatorForm onSubmit={this.savePalette}>
+          <TextValidator 
+          name='newPaletteName'
+          label="Palette Name" 
+          value={this.state.newPalleteName} 
+          onChange={this.handleChange} 
+          />
+          <Button color="primary" variant="contained" type='submit'>Save Palette</Button>
+            </ValidatorForm>          
         </Toolbar>
       </AppBar>
         
@@ -130,7 +157,8 @@ class NewPaletteForm extends Component {
           />
           <ValidatorForm onSubmit={this.addNewColor}>
             <TextValidator
-             value={this.state.newName}
+             value={this.state.newColorName}
+             name='newColorName'
              onChange={this.handleChange}
              validators={["required", "isColorNameUnique", "isColorUnique"]}
               errorMessages={["this field is required", "color names must be unique", "color already used"]}
