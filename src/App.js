@@ -17,6 +17,7 @@ class App extends Component {
   }
   findPalette(id){
     return this.state.palettes.find(function(palette) {
+      
       return palette.id === id;
     });
   }
@@ -26,13 +27,22 @@ class App extends Component {
   render() {
     return (
       <Switch>
+        {/* //route New palette */}
         <Route exact path='/palette/test' render={()=><TestNewformPalette/>} />
+
         <Route exact path='/palette/new' render={(routeProps)=><NewPaletteForm {...routeProps} palettes={this.state.palettes} savePalette={this.savePalette}/>} />
+        {/* //route paletteList */}
+        
         <Route exact path='/' render={(routeProps)=> <PaletteList palettes={this.state.palettes} {...routeProps}/>}/>
+                {/* //route palette */}
+
         <Route exact path='/palette/:id' render={routeProps => (
+          
             <Palette palette={generatePalette(this.findPalette(routeProps.match.params.id))}/>
             )}
              />
+                     {/* //route single color palette */}
+
              <Route exact path='/palette/:paletteId/:colorId'
              render={routeProps => (
               <SingleColorPalette colorId={routeProps.match.params.colorId} palette={generatePalette(this.findPalette(routeProps.match.params.paletteId))} routeProps={routeProps} />
